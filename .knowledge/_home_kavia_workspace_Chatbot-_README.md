@@ -1,0 +1,1 @@
+{"is_source_file": true, "state": 1, "description": "", "external_files": [], "external_methods": [], "published": [], "classes": [], "methods": [], "calls": [], "search-terms": [], "filename": "/home/kavia/workspace/Chatbot-/README.md", "hash": "5ae10a81c2dcdd36447262eb4be6f5fb", "format-version": 3, "code-base-name": "default"}
