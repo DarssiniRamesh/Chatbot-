@@ -1,14 +1,5 @@
 
 # Python ignorables
-.knowledge/
-.knowledge
-.function_call_history
-.init-env
-.init-files
-.init-minimal
-.init-run-tool
-.init-style
-.init-test-tool
 logs/
 __pycache__/
 *.py[cod]
