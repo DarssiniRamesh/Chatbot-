@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './ChatbotComponent.css';
 import { 
   Box, 
   TextField, 
@@ -14,7 +13,8 @@ import {
   DialogContentText,
   DialogTitle,
   Snackbar,
-  Alert
+  Alert,
+  styled
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
@@ -22,7 +22,80 @@ import HealingIcon from '@mui/icons-material/Healing';
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import chatbotService from '../../services/chatbotInstance';
-import medicalTheme from '../../theme/medical-theme';
+import retroTheme from '../../theme/retro-theme';
+
+// Styled components
+const ChatContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(1.25),
+  padding: theme.spacing(2.5),
+  maxHeight: 500,
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: theme.palette.background.default,
+    borderRadius: theme.shape.borderRadius,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: theme.palette.primary.light,
+    borderRadius: theme.shape.borderRadius,
+    '&:hover': {
+      background: theme.palette.primary.main,
+    },
+  },
+}));
+
+const MessageWrapper = styled(Box)(({ theme, sender }) => ({
+  display: 'flex',
+  alignItems: 'flex-start',
+  margin: theme.spacing(0.625, 0),
+  maxWidth: '80%',
+  marginLeft: sender === 'user' ? 'auto' : 0,
+  flexDirection: sender === 'user' ? 'row-reverse' : 'row',
+}));
+
+const MessageBubble = styled(Box)(({ theme, sender }) => ({
+  padding: theme.spacing(1.25, 1.875),
+  borderRadius: theme.spacing(1.875),
+  position: 'relative',
+  color: theme.palette.background.paper,
+  wordWrap: 'break-word',
+  backgroundColor: sender === 'user' ? theme.palette.primary.main : theme.palette.secondary.main,
+  borderTopRightRadius: sender === 'user' ? 0 : theme.spacing(1.875),
+  borderTopLeftRadius: sender === 'user' ? theme.spacing(1.875) : 0,
+  marginRight: sender === 'user' ? theme.spacing(1.25) : 0,
+  marginLeft: sender === 'user' ? 0 : theme.spacing(1.25),
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    ...(sender === 'user' ? {
+      right: -10,
+      borderLeft: `10px solid ${theme.palette.primary.main}`,
+      borderRight: '0 solid transparent',
+    } : {
+      left: -10,
+      borderRight: `10px solid ${theme.palette.secondary.main}`,
+      borderLeft: '0 solid transparent',
+    }),
+    borderBottom: '10px solid transparent',
+  },
+  textShadow: '0 1px 1px rgba(0, 0, 0, 0.2)',
+}));
+
+const Avatar = styled(Box)(({ theme }) => ({
+  width: 30,
+  height: 30,
+  borderRadius: '50%',
+  backgroundColor: theme.palette.background.default,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: `1px solid ${theme.palette.divider}`,
+}));
 
 // PUBLIC_INTERFACE
 const ChatbotComponent = () => {
@@ -161,7 +234,7 @@ const ChatbotComponent = () => {
   };
 
   return (
-    <ThemeProvider theme={medicalTheme}>
+    <ThemeProvider theme={retroTheme}>
       <Container maxWidth="md">
         <Box 
           sx={{ 
@@ -172,7 +245,9 @@ const ChatbotComponent = () => {
             mt: 4,
             bgcolor: 'background.paper',
             borderRadius: 2,
-            boxShadow: 3
+            boxShadow: 3,
+            border: '2px solid',
+            borderColor: 'primary.main',
           }}
         >
           <Box 
@@ -181,23 +256,25 @@ const ChatbotComponent = () => {
               alignItems: 'center',
               gap: 1,
               mb: 2,
-              borderBottom: 1,
-              borderColor: 'divider',
+              borderBottom: '2px solid',
+              borderColor: 'primary.main',
               pb: 1
             }}
           >
             <LocalHospitalIcon color="primary" />
-            <Typography variant="h6" color="primary">
+            <Typography variant="h6" color="primary" sx={{ letterSpacing: '0.05em' }}>
               Medical Assistant
             </Typography>
             <Box sx={{ marginLeft: 'auto' }}>
               <Button
                 onClick={handleOpenClearDialog}
-                color="inherit"
+                color="primary"
                 startIcon={<DeleteOutlineIcon />}
+                variant="outlined"
                 sx={{
+                  borderWidth: 2,
                   '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                    borderWidth: 2,
                   }
                 }}
               >
@@ -205,33 +282,42 @@ const ChatbotComponent = () => {
               </Button>
             </Box>
           </Box>
-          <Box className="chat-container">
+          <ChatContainer>
             {messages.map((message, index) => (
-              <div
+              <MessageWrapper
                 key={index}
-                className={`message ${message.sender === 'user' ? 'user-message' : 'bot-message'}`}
+                sender={message.sender}
               >
-                <div className="avatar">
+                <Avatar>
                   {message.sender === 'bot' ? (
                     <HealingIcon sx={{ color: 'secondary.main' }} />
                   ) : (
                     <PersonIcon sx={{ color: 'primary.main' }} />
                   )}
-                </div>
-                <div className="message-bubble">
-                  <Typography variant="body1">{message.text}</Typography>
+                </Avatar>
+                <MessageBubble sender={message.sender}>
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      color: 'background.paper',
+                      fontWeight: 500,
+                    }}
+                  >
+                    {message.text}
+                  </Typography>
                   <Typography 
                     variant="caption" 
                     sx={{ 
                       display: 'block',
                       mt: 0.5,
-                      opacity: 0.8
+                      opacity: 0.9,
+                      color: 'background.paper',
                     }}
                   >
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </Typography>
-                </div>
-              </div>
+                </MessageBubble>
+              </MessageWrapper>
             ))}
             {isLoading && (
               <Box 
@@ -281,7 +367,7 @@ const ChatbotComponent = () => {
                 </Typography>
               </Box>
             )}
-          </Box>
+          </ChatContainer>
           
           <Box 
             component="form" 
